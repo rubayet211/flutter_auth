@@ -12,31 +12,42 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _noteController = TextEditingController();
   final FirestoreService firestoreService = FirestoreService();
-  void openNoteBox({String? docId}) {
+  void openNoteBox({String? docId}) async {
+    if (docId != null) {
+      // Fetch the note text and set it to the controller
+      final noteText = await firestoreService.getNoteById(docId);
+      _noteController.text = noteText;
+    } else {
+      _noteController.clear();
+    }
+
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              content: TextField(
-                controller: _noteController,
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    if (docId == null) {
-                      firestoreService.createNote(_noteController.text);
-                    } else {
-                      firestoreService.updateNote(docId, _noteController.text);
-                    }
+      context: context,
+      builder: (context) => AlertDialog(
+        content: TextField(
+          controller: _noteController,
+          decoration: InputDecoration(
+            hintText: docId == null ? 'Enter your note' : 'Edit your note',
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              if (docId == null) {
+                firestoreService.createNote(_noteController.text);
+              } else {
+                firestoreService.updateNote(docId, _noteController.text);
+              }
 
-                    _noteController.clear();
+              _noteController.clear();
 
-                    Navigator.pop(context);
-                  },
-                  child:
-                      docId == null ? const Text("Add") : const Text("Update"),
-                ),
-              ],
-            ));
+              Navigator.pop(context);
+            },
+            child: docId == null ? const Text("Add") : const Text("Update"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
