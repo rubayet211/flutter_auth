@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _noteController = TextEditingController();
   final FirestoreService firestoreService = FirestoreService();
-  void openNoteBox() {
+  void openNoteBox({String? docId}) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -22,13 +22,18 @@ class _HomePageState extends State<HomePage> {
               actions: [
                 ElevatedButton(
                   onPressed: () {
-                    firestoreService.createNote(_noteController.text);
+                    if (docId == null) {
+                      firestoreService.createNote(_noteController.text);
+                    } else {
+                      firestoreService.updateNote(docId, _noteController.text);
+                    }
 
                     _noteController.clear();
 
                     Navigator.pop(context);
                   },
-                  child: Text("Add Note"),
+                  child:
+                      docId == null ? const Text("Add") : const Text("Update"),
                 ),
               ],
             ));
@@ -38,7 +43,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notes"),
+        title: const Text("Notes"),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
@@ -61,6 +66,10 @@ class _HomePageState extends State<HomePage> {
 
                 return ListTile(
                   title: Text(noteText),
+                  trailing: IconButton(
+                    onPressed: () => openNoteBox(docId: docId),
+                    icon: const Icon(Icons.edit),
+                  ),
                 );
               },
             );
