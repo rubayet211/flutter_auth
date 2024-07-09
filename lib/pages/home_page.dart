@@ -14,7 +14,6 @@ class _HomePageState extends State<HomePage> {
   final FirestoreService firestoreService = FirestoreService();
   void openNoteBox({String? docId}) async {
     if (docId != null) {
-      // Fetch the note text and set it to the controller
       final noteText = await firestoreService.getNoteById(docId);
       _noteController.text = noteText;
     } else {

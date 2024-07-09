@@ -5,16 +5,25 @@ class FirestoreService {
       FirebaseFirestore.instance.collection('notes');
 
   Future<Object> createNote(String note) async {
-    return notes.add({
-      'note': note,
-      'timestamp': Timestamp.now(),
-    });
+    try {
+      DocumentReference docRef = await notes.add({
+        'note': note,
+        'timestamp': Timestamp.now(),
+      });
+      return docRef.id;
+    } catch (e) {
+      throw Exception('Failed to create note');
+    }
   }
 
   Stream<QuerySnapshot> getNotes() {
-    final notesStream =
-        notes.orderBy('timestamp', descending: true).snapshots();
-    return notesStream;
+    try {
+      final notesStream =
+          notes.orderBy('timestamp', descending: true).snapshots();
+      return notesStream;
+    } catch (e) {
+      throw Exception('Failed to get notes stream');
+    }
   }
 
   Future<String> getNoteById(String docId) async {
@@ -26,15 +35,26 @@ class FirestoreService {
         throw Exception('Document does not exist');
       }
     } catch (e) {
-      print('Error getting note: $e');
       throw Exception('Failed to get note');
     }
   }
 
-  Future<void> updateNote(String docId, String newNote) {
-    return notes.doc(docId).update({
-      'note': newNote,
-      'timestamp': Timestamp.now(),
-    });
+  Future<void> updateNote(String docId, String newNote) async {
+    try {
+      await notes.doc(docId).update({
+        'note': newNote,
+        'timestamp': Timestamp.now(),
+      });
+    } catch (e) {
+      throw Exception('Failed to update note');
+    }
+  }
+
+  Future<void> deleteNoteById(String docId) async {
+    try {
+      await notes.doc(docId).delete();
+    } catch (e) {
+      throw Exception('Failed to delete note');
+    }
   }
 }
