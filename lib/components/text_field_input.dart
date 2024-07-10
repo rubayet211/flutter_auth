@@ -17,6 +17,7 @@ class TextFieldInput extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
+        border: OutlineInputBorder(),
         hintText: hintText,
       ),
     );
