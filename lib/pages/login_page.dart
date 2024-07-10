@@ -2,7 +2,6 @@ import 'package:auth_demo/components/my_button.dart';
 import 'package:auth_demo/components/text_field_input.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:auth_demo/helper/helper_methods.dart';
 
 class LoginPage extends StatelessWidget {
