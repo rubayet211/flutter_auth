@@ -1,6 +1,7 @@
 import 'package:auth_demo/firebase_options.dart';
 import 'package:auth_demo/pages/home_page.dart';
 import 'package:auth_demo/pages/login_page.dart';
+import 'package:auth_demo/pages/register_page.dart';
 import 'package:auth_demo/theme/dark_mode.dart';
 import 'package:auth_demo/theme/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // home: HomePage(),
-      home: LoginPage(),
+      home: RegisterPage(),
       theme: lightMode,
       darkTheme: darkMode,
     );
