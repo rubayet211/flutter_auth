@@ -1,5 +1,7 @@
+import 'package:auth_demo/auth/login_or_register.dart';
 import 'package:auth_demo/services/NoteService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -54,6 +56,22 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Notes"),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const LoginOrRegister();
+                  },
+                ),
+              );
+            },
+            icon: const Icon(Icons.logout),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: openNoteBox,
