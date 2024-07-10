@@ -1,4 +1,4 @@
-import 'package:auth_demo/services/firestore.dart';
+import 'package:auth_demo/services/NotesService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +11,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _noteController = TextEditingController();
-  final FirestoreService firestoreService = FirestoreService();
+  final NoteService firestoreService = NoteService();
   void openNoteBox({String? docId}) async {
     if (docId != null) {
       final noteText = await firestoreService.getNoteById(docId);

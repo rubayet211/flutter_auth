@@ -1,8 +1,6 @@
 import 'package:auth_demo/auth/login_or_register.dart';
 import 'package:auth_demo/firebase_options.dart';
 import 'package:auth_demo/pages/home_page.dart';
-import 'package:auth_demo/pages/login_page.dart';
-import 'package:auth_demo/pages/register_page.dart';
 import 'package:auth_demo/theme/dark_mode.dart';
 import 'package:auth_demo/theme/light_mode.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,8 +19,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: HomePage(),
-      home: LoginOrRegister(),
+      initialRoute: '/loginOrRegister',
+      routes: {
+        '/loginOrRegister': (context) => const LoginOrRegister(),
+        '/home': (context) => const HomePage(),
+      },
       theme: lightMode,
       darkTheme: darkMode,
     );
