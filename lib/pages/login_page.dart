@@ -1,37 +1,25 @@
 import 'package:auth_demo/components/my_button.dart';
 import 'package:auth_demo/components/text_field_input.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:auth_demo/model/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:auth_demo/helper/helper_methods.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   final void Function()? onTap;
 
   LoginPage({super.key, required this.onTap});
 
   void loginUser(BuildContext context) async {
-    showDialog(
-      context: context,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-              email: _emailController.text, password: _passwordController.text);
-
-      // Navigate to the HomePage after successful login
-      Navigator.pop(context); // Remove the loading indicator
-      Navigator.pushReplacementNamed(context, '/home'); // Navigate to HomePage
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context); // Remove the loading indicator
-      displayMessageToUser(
-          e.code, context); // Display the error message to the user
+      await userProvider.signIn(
+          _emailController.text, _passwordController.text);
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -89,7 +77,7 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
         ),

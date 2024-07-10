@@ -1,11 +1,8 @@
 import 'package:auth_demo/components/my_button.dart';
 import 'package:auth_demo/components/text_field_input.dart';
-import 'package:auth_demo/helper/helper_methods.dart';
-import 'package:auth_demo/services/UserService.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:auth_demo/model/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
@@ -23,35 +20,21 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  void registerUser() async {
+  void registerUser(BuildContext context) async {
     if (_passwordController.text != _confirmPasswordController.text) {
-      displayMessageToUser("Passwords do not match", context);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Passwords do not match")));
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-              email: _emailController.text, password: _passwordController.text);
-
-      User? user = userCredential.user;
-
-      if (user != null) {
-        await UserService().createUser(
-            user.uid, _usernameController.text, _emailController.text);
-      }
-
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      displayMessageToUser(e.code, context);
+      await userProvider.register(
+          _emailController.text, _passwordController.text);
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -99,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     controller: _confirmPasswordController,
                     obscureText: true),
                 const SizedBox(height: 25),
-                MyButton(text: "Register", onTap: registerUser),
+                MyButton(text: "Register", onTap: () => registerUser(context)),
                 const SizedBox(height: 25),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

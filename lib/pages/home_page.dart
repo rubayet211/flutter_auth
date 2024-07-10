@@ -1,8 +1,8 @@
-import 'package:auth_demo/auth/login_or_register.dart';
-import 'package:auth_demo/services/NoteService.dart';
+import 'package:auth_demo/model/note_provider.dart';
+import 'package:auth_demo/model/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,10 +13,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _noteController = TextEditingController();
-  final NoteService firestoreService = NoteService();
+
   void openNoteBox({String? docId}) async {
+    final noteProvider = Provider.of<NoteProvider>(context, listen: false);
     if (docId != null) {
-      final noteText = await firestoreService.getNoteById(docId);
+      final noteText = await noteProvider.getNoteById(docId);
       _noteController.text = noteText;
     } else {
       _noteController.clear();
@@ -35,9 +36,9 @@ class _HomePageState extends State<HomePage> {
           ElevatedButton(
             onPressed: () {
               if (docId == null) {
-                firestoreService.createNote(_noteController.text);
+                noteProvider.addNote(_noteController.text);
               } else {
-                firestoreService.updateNote(docId, _noteController.text);
+                noteProvider.updateNote(docId, _noteController.text);
               }
 
               _noteController.clear();
@@ -59,15 +60,8 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return const LoginOrRegister();
-                  },
-                ),
-              );
+              await Provider.of<UserProvider>(context, listen: false).signOut();
+              Navigator.pushReplacementNamed(context, '/loginOrRegister');
             },
             icon: const Icon(Icons.logout),
           ),
@@ -77,42 +71,39 @@ class _HomePageState extends State<HomePage> {
         onPressed: openNoteBox,
         child: const Icon(Icons.add),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: firestoreService.getNotes(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List notesList = snapshot.data!.docs;
-
-            return ListView.builder(
-              itemCount: notesList.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot note = notesList[index];
-                String docId = note.id;
-
-                Map<String, dynamic> data = note.data() as Map<String, dynamic>;
-                String noteText = data['note'];
-
-                return ListTile(
-                  title: Text(noteText),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () => openNoteBox(docId: docId),
-                        icon: const Icon(Icons.edit),
-                      ),
-                      IconButton(
-                        onPressed: () => firestoreService.deleteNoteById(docId),
-                        icon: const Icon(Icons.delete),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          } else {
-            return const Text("No notes");
+      body: Consumer<NoteProvider>(
+        builder: (context, noteProvider, child) {
+          if (noteProvider.notes.isEmpty) {
+            return const Center(child: Text("No notes"));
           }
+
+          return ListView.builder(
+            itemCount: noteProvider.notes.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot note = noteProvider.notes[index];
+              String docId = note.id;
+
+              Map<String, dynamic> data = note.data() as Map<String, dynamic>;
+              String noteText = data['note'];
+
+              return ListTile(
+                title: Text(noteText),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () => openNoteBox(docId: docId),
+                      icon: const Icon(Icons.edit),
+                    ),
+                    IconButton(
+                      onPressed: () => noteProvider.deleteNoteById(docId),
+                      icon: const Icon(Icons.delete),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
         },
       ),
     );
