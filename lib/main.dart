@@ -1,3 +1,4 @@
+import 'package:auth_demo/auth/login_or_register.dart';
 import 'package:auth_demo/firebase_options.dart';
 import 'package:auth_demo/pages/home_page.dart';
 import 'package:auth_demo/pages/login_page.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // home: HomePage(),
-      home: RegisterPage(),
+      home: LoginOrRegister(),
       theme: lightMode,
       darkTheme: darkMode,
     );

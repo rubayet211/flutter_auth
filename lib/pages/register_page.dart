@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+  final void Function()? onTap;
+
+  RegisterPage({super.key, required this.onTap});
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -70,7 +72,7 @@ class RegisterPage extends StatelessWidget {
                 const SizedBox(
                   height: 25,
                 ),
-                MyButton(text: "Register", onTap: () {}),
+                MyButton(text: "Register", onTap: onTap),
                 const SizedBox(
                   height: 25,
                 ),
@@ -79,7 +81,7 @@ class RegisterPage extends StatelessWidget {
                   children: [
                     const Text("Already have an account? "),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: onTap,
                       child: const Text(
                         "Login",
                         style: TextStyle(
